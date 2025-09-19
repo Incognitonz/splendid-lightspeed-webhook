@@ -141,8 +141,8 @@ exports.handler = async (event, context) => {
 
     let actions = [];
 
-    // Handle different event types
-    const supportedEvents = ['sale.ready_for_payment', 'sale.line_items.added', 'sale.customer.changed'];
+    // Handle different event types (removed customer.changed)
+    const supportedEvents = ['sale.ready_for_payment', 'sale.line_items.added'];
     
     if (supportedEvents.includes(data.event_type)) {
       const lineItems = data.sale?.line_items || [];
