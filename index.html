@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splendid Film Lab - Due Date Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin: 20px 0;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .feature h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .install-button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 40px auto;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .install-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .turnaround-info {
+            background: #e8f4fd;
+            border: 1px solid #b3d9f7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .turnaround-info h3 {
+            margin-top: 0;
+            color: #1565c0;
+        }
+
+        .turnaround-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span class="emoji">📸</span> Splendid Film Lab</h1>
+        <p class="subtitle">Automatic Due Date Calculator for Lightspeed POS</p>
+
+        <div class="feature">
+            <h3><span class="emoji">🎯</span> Smart Due Date Calculation</h3>
+            <p>Automatically calculates due dates based on your lab's turnaround times and handles business days correctly for B&W film processing.</p>
+        </div>
+
+        <div class="turnaround-info">
+            <h3>Supported Turnaround Times:</h3>
+            <ul class="turnaround-list">
+                <li><strong>FAST:</strong> Same day if ordered before 2pm, otherwise next day (7 days/week)</li>
+                <li><strong>3 Days:</strong> +3 calendar days for C41 film, +3 business days for B&W film</li>
+                <li><strong>1 Week:</strong> +7 calendar days for all film types</li>
+            </ul>
+        </div>
+
+        <div class="feature">
+            <h3><span class="emoji">⚡</span> Seamless Integration</h3>
+            <p>Works alongside your existing Lightspeed apps (like Quote Machine) without conflicts. The popup appears automatically when lab services are added to a sale.</p>
+        </div>
+
+        <div class="feature">
+            <h3><span class="emoji">📝</span> Automatic Documentation</h3>
+            <p>Due dates are automatically added to sale notes and custom fields, ensuring they appear on receipts and in your system for tracking.</p>
+        </div>
+
+        <div class="feature">
+            <h3><span class="emoji">🔧</span> Easy Setup</h3>
+            <p>One-click installation automatically configures all necessary webhooks and rules. No manual API configuration required.</p>
+        </div>
+
+        <a href="/.netlify/functions/install" class="install-button">
+            <span class="emoji">🚀</span> Install Now
+        </a>
+
+        <div class="footer">
+            <p>Built specifically for Splendid Film Lab | Powered by Netlify & Lightspeed</p>
+            <p>Need support? Contact your development team for assistance.</p>
+        </div>
+    </div>
+</body>
+</html>
