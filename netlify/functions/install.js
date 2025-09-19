@@ -101,23 +101,23 @@ exports.handler = async (event, context) => {
     });
 
     const existingRules = await existingRulesResponse.json();
-    const hasPaymentRule = existingRules.data?.some(rule => rule.event_type === 'sale.ready_for_payment');
-    const hasLineItemRule = existingRules.data?.some(rule => rule.event_type === 'sale.line_items.added');
+    const paymentRules = existingRules.data?.filter(rule => rule.event_type === 'sale.ready_for_payment') || [];
+    const lineItemRules = existingRules.data?.filter(rule => rule.event_type === 'sale.line_items.added') || [];
 
-    // Create rules on available events
+    // Determine the best event to use
     const rulesToCreate = [];
+    let conflictInfo = [];
     
-    if (!hasPaymentRule) {
+    if (paymentRules.length === 0) {
+      // Ideal - use payment screen trigger
       rulesToCreate.push('sale.ready_for_payment');
-    }
-    
-    if (!hasLineItemRule) {
+    } else if (lineItemRules.length === 0) {
+      // Good alternative - trigger when lab items are added
       rulesToCreate.push('sale.line_items.added');
-    }
-
-    // If both events are taken, use customer.changed as fallback
-    if (rulesToCreate.length === 0) {
-      rulesToCreate.push('sale.customer.changed');
+      conflictInfo.push('sale.ready_for_payment is used by other apps');
+    } else {
+      // Both events are taken - installation should fail with helpful message
+      throw new Error(`Cannot install: Both sale.ready_for_payment and sale.line_items.added events are already in use by other apps. Please contact your system administrator to resolve workflow conflicts.`);
     }
 
     const createdRules = [];
@@ -170,12 +170,10 @@ exports.handler = async (event, context) => {
             <li>Active on events: ${createdRules.join(', ')}</li>
             <li>Store: ${domainPrefix}.retail.lightspeed.app</li>
           </ul>
+          ${conflictInfo.length > 0 ? `
+          <p><strong>Note:</strong> ${conflictInfo.join(', ')} - using alternative trigger for compatibility.</p>
+          ` : ''}
         </div>
-
-        ${createdRules.includes('sale.customer.changed') ? `
-        <div class="warning">
-          <strong>Note:</strong> Other workflow apps were detected, so the due date popup will trigger when you add/change a customer on sales with lab services. This ensures compatibility with your existing apps.
-        </div>` : ''}
 
         <div class="info">
           <h3>🧪 How to test:</h3>
