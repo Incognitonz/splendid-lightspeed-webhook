@@ -14,16 +14,13 @@ exports.handler = async (event, context) => {
   if (!code) {
     // Step 1: Redirect to Lightspeed for authorization
     const clientId = 'c5qsLva63BJKSuC245ClPwhaQdHmNRsc';
-    const redirectUri = 'https://splendidrules.netlify.app/.netlify/functions/install'; // Hardcoded
-    const scope = 'write:sale read:sale write:workflow read:workflow';
+    const redirectUri = 'https://splendidrules.netlify.app/.netlify/functions/install';
     const stateParam = Math.random().toString(36).substring(2, 15);
     
-    console.log('Debug - Redirect URI being used:', redirectUri);
-    
+    // NOTE: X-Series does not support scopes - removed scope parameter
     const authUrl = `https://secure.retail.lightspeed.app/connect` +
       `?response_type=code` +
       `&client_id=${clientId}` +
-      `&scope=${encodeURIComponent(scope)}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&state=${stateParam}`;
 
