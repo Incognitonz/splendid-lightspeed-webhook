@@ -1,3 +1,4 @@
+// Add this as netlify/functions/detailed-debug.js
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -10,10 +11,11 @@ exports.handler = async (event, context) => {
 
   try {
     const data = JSON.parse(event.body || '{}');
-    
-    // Extract line items info
     const lineItems = data.sale?.line_items || [];
-    const skus = lineItems.map(item => item.product?.sku || item.sku || 'NO_SKU');
+    
+    // Get the full structure of the first line item
+    const firstItem = lineItems[0] || {};
+    const itemStructure = JSON.stringify(firstItem, null, 2);
     
     return {
       statusCode: 200,
@@ -22,8 +24,8 @@ exports.handler = async (event, context) => {
         actions: [
           {
             type: 'confirm',
-            title: 'Debug Info',
-            message: `Event: ${data.event_type}\nLine Items: ${lineItems.length}\nSKUs: ${skus.join(', ')}\nLooking for: 10050`,
+            title: 'Line Item Structure',
+            message: `First line item structure:\n${itemStructure.substring(0, 300)}...`,
             confirm_label: 'OK',
             dismiss_label: 'Cancel'
           }
