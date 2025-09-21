@@ -11,7 +11,7 @@ exports.handler = async (event, context) => {
   try {
     const data = JSON.parse(event.body || '{}');
     
-    // Simple check for your specific product ID
+    // Check for your specific product ID
     const targetProductId = '2fd89437-bb52-6a6e-56e2-3aa539ac480c';
     const lineItems = data.sale?.line_items || [];
     
@@ -21,11 +21,6 @@ exports.handler = async (event, context) => {
     });
 
     if (hasLabService && data.event_type === 'sale.ready_for_payment') {
-      // Simple date formatting that won't crash
-      const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + 3);
-      const dueDateStr = dueDate.toISOString().split('T')[0]; // YYYY-MM-DD format
-
       return {
         statusCode: 200,
         headers,
@@ -33,15 +28,12 @@ exports.handler = async (event, context) => {
           actions: [
             {
               type: 'require_custom_fields',
-              title: 'Splendid Film Lab - Set Due Date',
-              message: 'Please select the turnaround time:',
+              title: 'Film Lab Due Date',
+              message: 'Enter due date for this lab order:',
               entity: 'sale',
               required_custom_fields: [
                 {
-                  name: 'lab_turnaround_selection',
-                  values: [
-                    { value: '3day', title: `3 Days - Due: ${dueDateStr}` }
-                  ]
+                  name: 'lab_due_date'
                 }
               ]
             }
