@@ -22,6 +22,13 @@ exports.handler = async (event, context) => {
   try {
     const data = JSON.parse(event.body || '{}');
     
+    // Add debugging - log what we receive from Lightspeed
+    console.log('=== LIGHTSPEED REQUEST DEBUG ===');
+    console.log('Event type:', data.event_type);
+    console.log('Line items count:', data.sale?.line_items?.length || 0);
+    console.log('Line items:', JSON.stringify(data.sale?.line_items || [], null, 2));
+    console.log('================================');
+    
     if (!data || !data.event_type) {
       return {
         statusCode: 400,
