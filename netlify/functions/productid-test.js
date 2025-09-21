@@ -1,3 +1,4 @@
+// netlify/functions/lab-webhook.js - Main webhook handler for due date popup
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
