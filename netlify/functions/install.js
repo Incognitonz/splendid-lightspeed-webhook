@@ -14,9 +14,11 @@ exports.handler = async (event, context) => {
   if (!code) {
     // Step 1: Redirect to Lightspeed for authorization
     const clientId = 'c5qsLva63BJKSuC245ClPwhaQdHmNRsc';
-    const redirectUri = `https://${event.headers.host}/.netlify/functions/install`;
+    const redirectUri = 'https://splendidrules.netlify.app/.netlify/functions/install'; // Hardcoded
     const scope = 'write:sale read:sale write:workflow read:workflow';
     const stateParam = Math.random().toString(36).substring(2, 15);
+    
+    console.log('Debug - Redirect URI being used:', redirectUri);
     
     const authUrl = `https://secure.retail.lightspeed.app/connect` +
       `?response_type=code` +
@@ -24,6 +26,8 @@ exports.handler = async (event, context) => {
       `&scope=${encodeURIComponent(scope)}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&state=${stateParam}`;
+
+    console.log('Debug - Auth URL:', authUrl);
 
     return {
       statusCode: 302,
@@ -39,7 +43,7 @@ exports.handler = async (event, context) => {
     // Step 2: Exchange code for access token
     const clientId = 'c5qsLva63BJKSuC245ClPwhaQdHmNRsc';
     const clientSecret = 'V0fsbWwN27deW31Cmk53jLy3UoSlPuCW';
-    const redirectUri = `https://${event.headers.host}/.netlify/functions/install`;
+    const redirectUri = 'https://splendidrules.netlify.app/.netlify/functions/install'; // Hardcoded
 
     const tokenResponse = await fetch('https://secure.retail.lightspeed.app/api/1.0/token', {
       method: 'POST',
