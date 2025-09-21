@@ -18,7 +18,7 @@ exports.handler = async (event, context) => {
     const scope = 'write:sale read:sale write:workflow read:workflow';
     const stateParam = Math.random().toString(36).substring(2, 15);
     
-    const authUrl = `https://cloud.lightspeedapp.com/oauth/authorize.php` +
+    const authUrl = `https://secure.retail.lightspeed.app/connect` +
       `?response_type=code` +
       `&client_id=${clientId}` +
       `&scope=${encodeURIComponent(scope)}` +
@@ -41,7 +41,7 @@ exports.handler = async (event, context) => {
     const clientSecret = 'V0fsbWwN27deW31Cmk53jLy3UoSlPuCW';
     const redirectUri = `https://${event.headers.host}/.netlify/functions/install`;
 
-    const tokenResponse = await fetch('https://cloud.lightspeedapp.com/oauth/access_token.php', {
+    const tokenResponse = await fetch('https://secure.retail.lightspeed.app/api/1.0/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -61,15 +61,19 @@ exports.handler = async (event, context) => {
       throw new Error('Failed to get access token');
     }
 
-    // Step 3: Get retailer info
-    const retailerResponse = await fetch('https://api.lightspeedapp.com/API/V3/Account.json', {
-      headers: {
-        'Authorization': `Bearer ${tokenData.access_token}`
+    // Step 3: Get retailer info from the token response
+    // X-Series includes domain info in the token response
+    let domainPrefix = 'unknown';
+    
+    if (tokenData.domain_prefix) {
+      domainPrefix = tokenData.domain_prefix;
+    } else if (tokenData.account_url) {
+      // Extract domain from account_url if available
+      const urlMatch = tokenData.account_url.match(/https:\/\/([^.]+)\.retail\.lightspeed\.app/);
+      if (urlMatch) {
+        domainPrefix = urlMatch[1];
       }
-    });
-
-    const retailerData = await retailerResponse.json();
-    const domainPrefix = retailerData.Account?.domain || 'unknown';
+    }
 
     // Step 4: Set up the webhook rules
     const webhookUrl = `https://${event.headers.host}/.netlify/functions/lab-webhook`;
