@@ -28,7 +28,7 @@ exports.handler = async (event, context) => {
     });
 
     // Process one lab service item at a time
-    if (labServiceItems.length > 0 && data.event_type === 'sale.ready_for_payment') {
+    if (labServiceItems.length > 0 && data.event_type === 'sale.line_items.added') {
       const firstLabItem = labServiceItems[0];
       
       // Determine turnaround type based on product ID
