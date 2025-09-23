@@ -182,10 +182,9 @@ exports.handler = async (event, context) => {
         const productId = lineItem.product?.id || '';
         
         if (isLabService(productId)) {
-          // Check if this item already has a due date set
-          const alreadyHasDueDate = lineItem.custom_fields?.some(field => 
-            field.name === 'film_due_date' && field.string_value
-          );
+          // Check if this item already has a due date in the note
+          const existingNote = lineItem.note || '';
+          const alreadyHasDueDate = existingNote.includes('Due:');
 
           if (!alreadyHasDueDate) {
             const turnaroundType = getTurnaroundType(productId);
@@ -206,24 +205,27 @@ exports.handler = async (event, context) => {
               serviceLabel = '1 Week';
             }
 
+            // Create the new note with due date
+            const newNote = existingNote ? `${existingNote}\nDue: ${dueDateFormatted}` : `Due: ${dueDateFormatted}`;
+
             return {
               statusCode: 200,
               headers,
               body: JSON.stringify({
                 actions: [
                   {
+                    type: 'confirm',
+                    title: `Film Lab Due Date - ${serviceLabel}`,
+                    message: `Due date calculated: ${dueDateFormatted}\n\nThis will be added to the line item note. Click OK to confirm or Cancel to skip.`,
+                    confirm_label: 'Set Due Date',
+                    dismiss_label: 'Skip'
+                  },
+                  {
                     type: 'set_custom_field',
                     entity: 'line_item',
                     entity_id: lineItem.id,
-                    custom_field_name: 'film_due_date',
-                    custom_field_value: dueDateFormatted
-                  },
-                  {
-                    type: 'confirm',
-                    title: `Film Lab Due Date - ${serviceLabel}`,
-                    message: `Due date automatically set to: ${dueDateFormatted}\n\nClick OK to accept, or Cancel to edit manually.`,
-                    confirm_label: 'Accept Date',
-                    dismiss_label: 'Edit Manually'
+                    custom_field_name: 'note',
+                    custom_field_value: newNote
                   }
                 ]
               })
