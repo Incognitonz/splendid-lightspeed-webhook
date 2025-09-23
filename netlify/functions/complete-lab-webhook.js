@@ -182,9 +182,10 @@ exports.handler = async (event, context) => {
         const productId = lineItem.product?.id || '';
         
         if (isLabService(productId)) {
-          // Check if this item already has a due date in the note
-          const existingNote = lineItem.note || '';
-          const alreadyHasDueDate = existingNote.includes('Due:');
+          // Check if this item already has a due date in custom fields
+          const alreadyHasDueDate = lineItem.custom_fields?.some(field => 
+            field.name === 'film_due_date' && field.string_value
+          );
 
           if (!alreadyHasDueDate) {
             const turnaroundType = getTurnaroundType(productId);
@@ -205,27 +206,22 @@ exports.handler = async (event, context) => {
               serviceLabel = '1 Week';
             }
 
-            // Create the new note with due date
-            const newNote = existingNote ? `${existingNote}\nDue: ${dueDateFormatted}` : `Due: ${dueDateFormatted}`;
-
             return {
               statusCode: 200,
               headers,
               body: JSON.stringify({
                 actions: [
                   {
-                    type: 'confirm',
+                    type: 'require_custom_fields',
                     title: `Film Lab Due Date - ${serviceLabel}`,
-                    message: `Due date calculated: ${dueDateFormatted}\n\nThis will be added to the line item note. Click OK to confirm or Cancel to skip.`,
-                    confirm_label: 'Set Due Date',
-                    dismiss_label: 'Skip'
-                  },
-                  {
-                    type: 'set_custom_field',
+                    message: `Calculated due date: ${dueDateFormatted}\n\nEnter due date (copy from above or enter custom date):`,
                     entity: 'line_item',
                     entity_id: lineItem.id,
-                    custom_field_name: 'note',
-                    custom_field_value: newNote
+                    required_custom_fields: [
+                      {
+                        name: 'film_due_date'
+                      }
+                    ]
                   }
                 ]
               })
