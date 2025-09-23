@@ -217,13 +217,6 @@ exports.handler = async (event, context) => {
                     entity_id: lineItem.id,
                     custom_field_name: 'film_due_date',
                     custom_field_value: dueDateFormatted
-                  },
-                  {
-                    type: 'confirm',
-                    title: `Film Lab Due Date - ${serviceLabel}`,
-                    message: `Due date automatically set to: ${dueDateFormatted}\n\nClick OK to accept, or Cancel to edit manually.`,
-                    confirm_label: 'Accept Date',
-                    dismiss_label: 'Edit Manually'
                   }
                 ]
               })
