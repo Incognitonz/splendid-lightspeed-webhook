@@ -296,12 +296,12 @@ exports.handler = async (event, context) => {
             let serviceLabel;
             if (turnaroundType === 'fast') {
               serviceLabel = currentHour < 14 ? 
-                (isBw ? 'FAST - Today (next business day if holiday)' : 'FAST - Today (next day if holiday)') : 
+                (isBw ? 'FAST - Today (next business day if holiday)' : 'FAST - Today') : 
                 (isBw ? 'FAST - Tomorrow (next business day if holiday)' : 'FAST - Tomorrow (next day if holiday)');
             } else if (turnaroundType === '3day') {
-              serviceLabel = isBw ? '3 Business Days (excluding weekends & holidays)' : '3 Days (adjusted for holidays only)';
+              serviceLabel = isBw ? '3 Business Days (excluding weekends & holidays)' : '3 Days';
             } else {
-              serviceLabel = isBw ? '1 Week (adjusted for business days)' : '1 Week (adjusted for holidays only)';
+              serviceLabel = isBw ? '1 Week (business days)' : '1 Week';
             }
 
             return {
