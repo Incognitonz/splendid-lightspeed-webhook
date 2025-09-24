@@ -304,22 +304,18 @@ exports.handler = async (event, context) => {
               serviceLabel = isBw ? '1 Week (business days)' : '1 Week';
             }
 
+          
             return {
               statusCode: 200,
               headers,
               body: JSON.stringify({
                 actions: [
                   {
-                    type: 'require_custom_fields',
-                    title: `Film Lab Due Date - ${serviceLabel}`,
-                    message: `Calculated due date: ${dueDateFormatted}\n\nEnter due date (copy from above or enter custom date):`,
+                    type: 'set_custom_field',
                     entity: 'line_item',
                     entity_id: lineItem.id,
-                    required_custom_fields: [
-                      {
-                        name: 'film_due_date'
-                      }
-                    ]
+                    custom_field_name: 'film_due_date',
+                    custom_field_value: dueDateFormatted
                   }
                 ]
               })
