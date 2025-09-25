@@ -199,16 +199,24 @@ exports.handler = async (event, context) => {
     };
 
     const calculateDueDate = async (turnaroundType, isBwFilm = false) => {
+      // Get current time in New Zealand timezone
       const now = new Date();
-      const currentHour = now.getHours();
+      const nzTime = new Date(now.toLocaleString("en-US", {timeZone: "Pacific/Auckland"}));
+      const currentHour = nzTime.getHours();
+      const currentDay = nzTime.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      
       let dueDate;
       
       switch (turnaroundType) {
         case 'fast':
-          if (currentHour < 14) {
-            dueDate = now;
+          // Different cutoff times: 2pm on weekdays (Mon-Fri), 1pm on weekends (Sat-Sun)
+          const isWeekend = currentDay === 0 || currentDay === 6; // Sunday or Saturday
+          const cutoffHour = isWeekend ? 13 : 14; // 1pm on weekends, 2pm on weekdays
+          
+          if (currentHour < cutoffHour) {
+            dueDate = new Date(nzTime);
           } else {
-            const tomorrow = new Date(now);
+            const tomorrow = new Date(nzTime);
             tomorrow.setDate(tomorrow.getDate() + 1);
             dueDate = tomorrow;
           }
@@ -218,10 +226,10 @@ exports.handler = async (event, context) => {
         case '3day':
           if (isBwFilm) {
             // B&W films: count 3 business days (excluding weekends and holidays)
-            return await addBusinessDays(now, 3);
+            return await addBusinessDays(nzTime, 3);
           } else {
             // C41 films: add 3 calendar days, then adjust only if it lands on a public holiday (weekends are OK)
-            const threeDays = new Date(now);
+            const threeDays = new Date(nzTime);
             threeDays.setDate(threeDays.getDate() + 3);
             return await moveToNextOperatingDay(threeDays);
           }
@@ -229,18 +237,18 @@ exports.handler = async (event, context) => {
         case '1week':
           if (isBwFilm) {
             // B&W films: add 7 calendar days, then move to next business day if needed
-            const oneWeek = new Date(now);
+            const oneWeek = new Date(nzTime);
             oneWeek.setDate(oneWeek.getDate() + 7);
             return await moveToNextBusinessDay(oneWeek);
           } else {
             // C41 films: add 7 calendar days, then adjust only if it lands on a public holiday
-            const oneWeek = new Date(now);
+            const oneWeek = new Date(nzTime);
             oneWeek.setDate(oneWeek.getDate() + 7);
             return await moveToNextOperatingDay(oneWeek);
           }
           
         default:
-          const defaultDate = new Date(now);
+          const defaultDate = new Date(nzTime);
           defaultDate.setDate(defaultDate.getDate() + 1);
           return isBwFilm ? await moveToNextBusinessDay(defaultDate) : await moveToNextOperatingDay(defaultDate);
       }
@@ -291,31 +299,41 @@ exports.handler = async (event, context) => {
             const dueDate = await calculateDueDate(turnaroundType, isBw);
             const dueDateFormatted = formatDate(dueDate);
             
-            // Determine service type label
-            const currentHour = new Date().getHours();
+            // Determine service type label with current NZ time info
+            const nzTime = new Date(new Date().toLocaleString("en-US", {timeZone: "Pacific/Auckland"}));
+            const currentHour = nzTime.getHours();
+            const currentDay = nzTime.getDay();
+            const isWeekend = currentDay === 0 || currentDay === 6;
+            const cutoffHour = isWeekend ? 13 : 14;
+            
             let serviceLabel;
             if (turnaroundType === 'fast') {
-              serviceLabel = currentHour < 14 ? 
-                (isBw ? 'FAST - Today (next business day if holiday)' : 'FAST - Today') : 
+              const cutoffText = isWeekend ? '1pm on weekends' : '2pm on weekdays';
+              serviceLabel = currentHour < cutoffHour ? 
+                (isBw ? `FAST - Today (before ${cutoffText}, next business day if holiday)` : `FAST - Today (before ${cutoffText}, next day if holiday)`) : 
                 (isBw ? 'FAST - Tomorrow (next business day if holiday)' : 'FAST - Tomorrow (next day if holiday)');
             } else if (turnaroundType === '3day') {
-              serviceLabel = isBw ? '3 Business Days (excluding weekends & holidays)' : '3 Days';
+              serviceLabel = isBw ? '3 Business Days (excluding weekends & holidays)' : '3 Days (adjusted for holidays only)';
             } else {
-              serviceLabel = isBw ? '1 Week (business days)' : '1 Week';
+              serviceLabel = isBw ? '1 Week (adjusted for business days)' : '1 Week (adjusted for holidays only)';
             }
 
-          
             return {
               statusCode: 200,
               headers,
               body: JSON.stringify({
                 actions: [
                   {
-                    type: 'set_custom_field',
+                    type: 'require_custom_fields',
+                    title: `Film Lab Due Date - ${serviceLabel}`,
+                    message: `Calculated due date: ${dueDateFormatted}\n\nEnter due date (copy from above or enter custom date):`,
                     entity: 'line_item',
                     entity_id: lineItem.id,
-                    custom_field_name: 'film_due_date',
-                    custom_field_value: dueDateFormatted
+                    required_custom_fields: [
+                      {
+                        name: 'film_due_date'
+                      }
+                    ]
                   }
                 ]
               })
