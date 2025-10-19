@@ -83,41 +83,41 @@ exports.handler = async (event, context) => {
       'eb7a7fbb-700d-4621-8911-1958b7b7dd72'
     ];
 
-    const { loadHolidaysFromBlob } = require('./load-holidays');
+    const { loadHolidaysFromGitHub } = require('./load-holidays');
 
-        let publicHolidaysCache = null;
-    
-        const fetchPublicHolidays = async (year) => {
-          if (publicHolidaysCache) {
-            addDebug(`Using cached holidays from memory`);
-            return publicHolidaysCache;
-          }
-    
-          try {
-            addDebug(`Loading holidays from Netlify Blobs`);
-            const holidays = await loadHolidaysFromBlob();
-            
-            if (!holidays || holidays.length === 0) {
-              addDebug(`No holidays found in Blobs`);
-              return [];
-            }
-    
-            addDebug(`Blobs returned ${holidays.length} holidays`);
-            
-            // Debug: Log all holidays
-            holidays.forEach(holiday => {
-              const [day, month, yr] = holiday.ActualDate.split('/');
-              const isoDate = `${yr}-${month}-${day}`;
-              addDebug(`  - ${isoDate}: ${holiday.HolidayName}`);
-            });
-    
-            publicHolidaysCache = holidays;
-            return holidays;
-          } catch (error) {
-            addDebug(`Error fetching holidays: ${error.message}`);
+      let publicHolidaysCache = null;
+  
+      const fetchPublicHolidays = async (year) => {
+        if (publicHolidaysCache) {
+          addDebug(`Using cached holidays from memory`);
+          return publicHolidaysCache;
+        }
+  
+        try {
+          addDebug(`Loading holidays from GitHub`);
+          const holidays = await loadHolidaysFromGitHub();
+          
+          if (!holidays || holidays.length === 0) {
+            addDebug(`No holidays found in GitHub file`);
             return [];
           }
-        };
+  
+          addDebug(`GitHub file returned ${holidays.length} holidays`);
+          
+          // Debug: Log all holidays
+          holidays.forEach(holiday => {
+            const [day, month, yr] = holiday.ActualDate.split('/');
+            const isoDate = `${yr}-${month}-${day}`;
+            addDebug(`  - ${isoDate}: ${holiday.HolidayName}`);
+          });
+  
+          publicHolidaysCache = holidays;
+          return holidays;
+        } catch (error) {
+          addDebug(`Error fetching holidays: ${error.message}`);
+          return [];
+        }
+      };
           
         // Debug: Log all holidays and convert date format
         holidayArray.forEach((holiday, index) => {
