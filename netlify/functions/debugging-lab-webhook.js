@@ -84,7 +84,7 @@ exports.handler = async (event, context) => {
     ];
 
     const HOLIDAYS_API_KEY = 'b122addcbe0a49fb9755318d5edc5c62';
-    const HOLIDAYS_API_URL = 'https://www.public-holidays.nz/api';
+    const HOLIDAYS_API_URL = 'https://api.public-holidays.nz/v1';
 
     let publicHolidaysCache = null;
     let cacheYear = null;
@@ -103,7 +103,7 @@ exports.handler = async (event, context) => {
           return publicHolidaysCache;
         }
 
-        const url = `${HOLIDAYS_API_URL}?key=${HOLIDAYS_API_KEY}&year=${year}&countryCode=NZ`;
+        const url = `${HOLIDAYS_API_URL}/year?apikey=${HOLIDAYS_API_KEY}&year=${year}`;
         addDebug(`Fetching holidays from: ${url}`);
         
         const response = await fetch(url);
