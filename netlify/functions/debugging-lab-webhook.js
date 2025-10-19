@@ -89,6 +89,7 @@ exports.handler = async (event, context) => {
     let publicHolidaysCache = null;
     let cacheYear = null;
     let debugLog = [];
+    let holidayEncountered = null; // Track if a holiday caused a delay
 
     const addDebug = (message) => {
       const timestamp = new Date().toISOString();
@@ -164,6 +165,7 @@ exports.handler = async (event, context) => {
         const match = holidayIsoDate === dateString;
         if (match) {
           addDebug(`  ✓ MATCH FOUND: ${holiday.HolidayName}`);
+          holidayEncountered = holiday.HolidayName; // Store the holiday name
         }
         return match;
       });
@@ -380,6 +382,7 @@ exports.handler = async (event, context) => {
             const dueDateFormatted = formatDate(dueDate);
             
             addDebug(`\n✓ FINAL DUE DATE: ${dueDateFormatted} (${dueDate.toDateString()})`);
+            addDebug(`Holiday encountered: ${holidayEncountered || 'None'}`);
             addDebug(`Debug log:\n${debugLog.join('\n')}`);
             
             const nzTime = new Date(new Date().toLocaleString("en-US", {timeZone: "Pacific/Auckland"}));
@@ -395,9 +398,21 @@ exports.handler = async (event, context) => {
                 (isBw ? `FAST - Today (before ${cutoffText}, next business day if holiday)` : `FAST - Today (before ${cutoffText}, next day if holiday)`) : 
                 (isBw ? 'FAST - Tomorrow (next business day if holiday)' : 'FAST - Tomorrow (next day if holiday)');
             } else if (turnaroundType === '3day') {
-              serviceLabel = isBw ? '3 Business Days (excluding weekends & holidays)' : '3 Days (adjusted for holidays only)';
+              if (holidayEncountered) {
+                serviceLabel = isBw ? 
+                  `3 Business Days (adjusted due to ${holidayEncountered})` : 
+                  `3 Days (adjusted due to ${holidayEncountered})`;
+              } else {
+                serviceLabel = isBw ? '3 Business Days (excluding weekends & holidays)' : '3 Days (adjusted for holidays only)';
+              }
             } else {
-              serviceLabel = isBw ? '1 Week (adjusted for business days)' : '1 Week (adjusted for holidays only)';
+              if (holidayEncountered) {
+                serviceLabel = isBw ? 
+                  `1 Week (adjusted due to ${holidayEncountered})` : 
+                  `1 Week (adjusted due to ${holidayEncountered})`;
+              } else {
+                serviceLabel = isBw ? '1 Week (adjusted for business days)' : '1 Week (adjusted for holidays only)';
+              }
             }
 
             return {
