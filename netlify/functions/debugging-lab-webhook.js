@@ -116,9 +116,11 @@ exports.handler = async (event, context) => {
         const holidays = await response.json();
         addDebug(`API returned ${holidays.length} holidays for ${year}`);
         
-        // Debug: Log all holidays
+        // Debug: Log all holidays and convert date format
         holidays.forEach(holiday => {
-          addDebug(`  - ${holiday.date}: ${holiday.name}`);
+          const [day, month, yr] = holiday.ActualDate.split('/');
+          const isoDate = `${yr}-${month}-${day}`;
+          addDebug(`  - ${isoDate}: ${holiday.HolidayName}`);
         });
 
         publicHolidaysCache = holidays;
