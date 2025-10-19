@@ -1,20 +1,25 @@
-// Utility function to load holidays from the JSON file
+// Utility function to load holidays from Netlify Blobs
 // Import this in your main webhook
 
-const fs = require('fs').promises;
-const path = require('path');
+const { getStore } = require('@netlify/blobs');
 
-async function loadHolidaysFromFile() {
+async function loadHolidaysFromBlob() {
   try {
-    const holidaysPath = path.join(__dirname, 'holidays.json');
-    const data = await fs.readFile(holidaysPath, 'utf8');
+    const store = getStore('nz-holidays');
+    const data = await store.get('holidays');
+    
+    if (!data) {
+      console.log('No holidays data found in Blobs, returning empty array');
+      return [];
+    }
+    
     const holidaysData = JSON.parse(data);
-    console.log(`Loaded holidays from file, last updated: ${holidaysData.lastUpdated}`);
+    console.log(`Loaded holidays from Blobs, last updated: ${holidaysData.lastUpdated}`);
     return holidaysData.allHolidays || [];
   } catch (error) {
-    console.error(`Error loading holidays.json: ${error.message}`);
+    console.error(`Error loading holidays from Blobs: ${error.message}`);
     return [];
   }
 }
 
-module.exports = { loadHolidaysFromFile };
+module.exports = { loadHolidaysFromBlob };
