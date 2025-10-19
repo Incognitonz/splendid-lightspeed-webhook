@@ -1,9 +1,4 @@
 {
-  "success": true,
-  "message": "Generated holidays for 2025 and 2026. Copy the \"holidaysData\" object below to your netlify/holidays.json file on GitHub.",
-  "totalHolidays": 46,
-  "currentYearCount": 23,
-  "nextYearCount": 23,
   "holidaysData": {
     "lastUpdated": "2025-10-19T23:19:30.619Z",
     "years": {
