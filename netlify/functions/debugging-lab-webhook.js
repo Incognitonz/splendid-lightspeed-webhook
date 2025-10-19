@@ -381,7 +381,13 @@ exports.handler = async (event, context) => {
             const dueDate = await calculateDueDate(turnaroundType, isBw);
             const dueDateFormatted = formatDate(dueDate);
             
-            addDebug(`\n✓ FINAL DUE DATE: ${dueDateFormatted} (${dueDate.toDateString()})`);
+            // Add holiday info to the due date display if applicable
+            let dueDateDisplay = dueDateFormatted;
+            if (holidayEncountered) {
+              dueDateDisplay = `${dueDateFormatted} (adjusted due to ${holidayEncountered})`;
+            }
+            
+            addDebug(`\n✓ FINAL DUE DATE: ${dueDateDisplay}`);
             addDebug(`Holiday encountered: ${holidayEncountered || 'None'}`);
             addDebug(`Debug log:\n${debugLog.join('\n')}`);
             
@@ -425,14 +431,14 @@ exports.handler = async (event, context) => {
                     entity: 'line_item',
                     entity_id: lineItem.id,
                     custom_field_name: 'film_due_date',
-                    custom_field_value: dueDateFormatted
+                    custom_field_value: dueDateDisplay
                   }
                 ],
                 debug: {
                   log: debugLog,
-                  finalDueDate: dueDateFormatted,
+                  finalDueDate: dueDateDisplay,
                   dueDateTime: dueDate.toISOString(),
-                  serviceLabel: serviceLabel
+                  holidayEncountered: holidayEncountered
                 }
               })
             };
