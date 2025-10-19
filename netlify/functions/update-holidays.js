@@ -1,7 +1,5 @@
-// Run this function once a year to update the holidays in Netlify Blobs
-// Trigger via: curl -X POST https://your-netlify-domain/.netlify/functions/update-holidays
-
-const { getStore } = require('@netlify/blobs');
+// Run this once a year to update the holidays.json file on GitHub
+// You can trigger it manually or via a scheduled function
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -41,23 +39,18 @@ exports.handler = async (event, context) => {
     console.log(`Fetched ${currentYearHolidays.length} holidays for ${currentYear}`);
     console.log(`Fetched ${nextYearHolidays.length} holidays for ${nextYear}`);
     
-    // Save to Netlify Blobs
-    const store = getStore('nz-holidays');
-    await store.set('holidays', JSON.stringify(holidaysData));
-    
-    console.log(`Successfully updated holidays in Netlify Blobs`);
-    
+    // Return the data so you can manually copy it to your GitHub holidays.json file
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        message: `Updated holidays for ${currentYear} and ${nextYear}`,
+        message: `Generated holidays for ${currentYear} and ${nextYear}. Copy the "holidaysData" object below to your netlify/holidays.json file on GitHub.`,
         totalHolidays: allHolidays.length,
         currentYearCount: currentYearHolidays.length,
         nextYearCount: nextYearHolidays.length,
-        lastUpdated: holidaysData.lastUpdated
-      })
+        holidaysData: holidaysData
+      }, null, 2)
     };
     
   } catch (error) {
