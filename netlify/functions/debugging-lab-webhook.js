@@ -114,19 +114,37 @@ exports.handler = async (event, context) => {
         }
 
         const holidays = await response.json();
-        addDebug(`API returned ${holidays.length} holidays for ${year}`);
+        
+        // Debug: Log raw API response structure
+        addDebug(`Raw API response type: ${typeof holidays}`);
+        addDebug(`Raw API response: ${JSON.stringify(holidays).substring(0, 500)}`);
+        
+        let holidayArray = holidays;
+        // Check if response is wrapped in an object
+        if (holidays.holidays) {
+          holidayArray = holidays.holidays;
+          addDebug(`Unwrapped from .holidays property`);
+        }
+        
+        addDebug(`API returned ${holidayArray.length} holidays for ${year}`);
         
         // Debug: Log all holidays and convert date format
-        holidays.forEach(holiday => {
-          const [day, month, yr] = holiday.ActualDate.split('/');
-          const isoDate = `${yr}-${month}-${day}`;
-          addDebug(`  - ${isoDate}: ${holiday.HolidayName}`);
+        holidayArray.forEach((holiday, index) => {
+          addDebug(`Holiday ${index}: ${JSON.stringify(holiday).substring(0, 200)}`);
+          if (holiday.ActualDate && holiday.HolidayName) {
+            const [day, month, yr] = holiday.ActualDate.split('/');
+            const isoDate = `${yr}-${month}-${day}`;
+            addDebug(`  - ${isoDate}: ${holiday.HolidayName}`);
+          } else {
+            addDebug(`  Missing fields. Got: ${Object.keys(holiday).join(', ')}`);
+          }
         });
-
-        publicHolidaysCache = holidays;
+        
+        publicHolidaysCache = holidayArray;
         cacheYear = year;
+        return holidayArray;
 
-        return holidays;
+
       } catch (error) {
         addDebug(`Error fetching holidays: ${error.message}`);
         return [];
@@ -141,9 +159,11 @@ exports.handler = async (event, context) => {
       addDebug(`Checking if ${dateString} (${date.toDateString()}) is a holiday`);
       
       const isHoliday = holidays.some(holiday => {
-        const match = holiday.date === dateString;
+        const [day, month, yr] = holiday.ActualDate.split('/');
+        const holidayIsoDate = `${yr}-${month}-${day}`;
+        const match = holidayIsoDate === dateString;
         if (match) {
-          addDebug(`  ✓ MATCH FOUND: ${holiday.name}`);
+          addDebug(`  ✓ MATCH FOUND: ${holiday.HolidayName}`);
         }
         return match;
       });
