@@ -304,13 +304,17 @@ exports.handler = async (event, context) => {
             const oneWeek = new Date(nzTime);
             oneWeek.setDate(oneWeek.getDate() + 7);
             addDebug(`After +7 days: ${oneWeek.toDateString()}`);
-            return await moveToNextBusinessDay(oneWeek);
+            const adjusted = await moveToNextBusinessDay(oneWeek);
+            addDebug(`Final date after moving to next business day: ${adjusted.toDateString()}`);
+            return adjusted;
           } else {
             addDebug(`1 Week C41 - adding 7 calendar days, then adjusting for holidays`);
             const oneWeek = new Date(nzTime);
             oneWeek.setDate(oneWeek.getDate() + 7);
             addDebug(`After +7 days: ${oneWeek.toDateString()}`);
-            return await moveToNextOperatingDay(oneWeek);
+            const adjusted = await moveToNextOperatingDay(oneWeek);
+            addDebug(`Final date after moving to next operating day: ${adjusted.toDateString()}`);
+            return adjusted;
           }
           
         default:
@@ -321,12 +325,19 @@ exports.handler = async (event, context) => {
     };
 
     const formatDate = (date) => {
-      return date.toLocaleDateString('en-NZ', { 
+      // Create a date string without timezone conversion to avoid UTC issues
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      
+      // Parse the date components
+      const dateObj = new Date(year, date.getMonth(), date.getDate());
+      
+      return dateObj.toLocaleDateString('en-NZ', { 
         weekday: 'short', 
         month: 'short', 
         day: 'numeric', 
-        year: 'numeric',
-        timeZone: 'Pacific/Auckland'
+        year: 'numeric'
       });
     };
 
