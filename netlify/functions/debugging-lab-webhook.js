@@ -83,26 +83,26 @@ exports.handler = async (event, context) => {
       'eb7a7fbb-700d-4621-8911-1958b7b7dd72'
     ];
 
-    const { loadHolidaysFromFile } = require('./load-holidays');
+    const { loadHolidaysFromBlob } = require('./load-holidays');
 
-       let publicHolidaysCache = null;
+        let publicHolidaysCache = null;
     
         const fetchPublicHolidays = async (year) => {
           if (publicHolidaysCache) {
-            addDebug(`Using cached holidays from file`);
+            addDebug(`Using cached holidays from memory`);
             return publicHolidaysCache;
           }
     
           try {
-            addDebug(`Loading holidays from holidays.json file`);
-            const holidays = await loadHolidaysFromFile();
+            addDebug(`Loading holidays from Netlify Blobs`);
+            const holidays = await loadHolidaysFromBlob();
             
             if (!holidays || holidays.length === 0) {
-              addDebug(`No holidays found in file`);
+              addDebug(`No holidays found in Blobs`);
               return [];
             }
     
-            addDebug(`File returned ${holidays.length} holidays`);
+            addDebug(`Blobs returned ${holidays.length} holidays`);
             
             // Debug: Log all holidays
             holidays.forEach(holiday => {
