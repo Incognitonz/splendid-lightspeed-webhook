@@ -83,52 +83,42 @@ exports.handler = async (event, context) => {
       'eb7a7fbb-700d-4621-8911-1958b7b7dd72'
     ];
 
-    const HOLIDAYS_API_KEY = 'b122addcbe0a49fb9755318d5edc5c62';
-    const HOLIDAYS_API_URL = 'https://api.public-holidays.nz/v1';
+    const { loadHolidaysFromFile } = require('./load-holidays');
 
-    let publicHolidaysCache = null;
-    let cacheYear = null;
-    let debugLog = [];
-    let holidayEncountered = null; // Track if a holiday caused a delay
-
-    const addDebug = (message) => {
-      const timestamp = new Date().toISOString();
-      debugLog.push(`[${timestamp}] ${message}`);
-      console.log(`[${timestamp}] ${message}`);
-    };
-
-    const fetchPublicHolidays = async (year) => {
-      try {
-        if (publicHolidaysCache && cacheYear === year) {
-          addDebug(`Using cached holidays for ${year}`);
-          return publicHolidaysCache;
-        }
-
-        const url = `${HOLIDAYS_API_URL}/year?apikey=${HOLIDAYS_API_KEY}&year=${year}`;
-        addDebug(`Fetching holidays from: ${url}`);
-        
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-          addDebug(`API returned status ${response.status}`);
-          return [];
-        }
-
-        const holidays = await response.json();
-        
-        // Debug: Log raw API response structure
-        addDebug(`Raw API response type: ${typeof holidays}`);
-        addDebug(`Raw API response: ${JSON.stringify(holidays).substring(0, 500)}`);
-        
-        let holidayArray = holidays;
-        // Check if response is wrapped in an object
-        if (holidays.holidays) {
-          holidayArray = holidays.holidays;
-          addDebug(`Unwrapped from .holidays property`);
-        }
-        
-        addDebug(`API returned ${holidayArray.length} holidays for ${year}`);
-        
+       let publicHolidaysCache = null;
+    
+        const fetchPublicHolidays = async (year) => {
+          if (publicHolidaysCache) {
+            addDebug(`Using cached holidays from file`);
+            return publicHolidaysCache;
+          }
+    
+          try {
+            addDebug(`Loading holidays from holidays.json file`);
+            const holidays = await loadHolidaysFromFile();
+            
+            if (!holidays || holidays.length === 0) {
+              addDebug(`No holidays found in file`);
+              return [];
+            }
+    
+            addDebug(`File returned ${holidays.length} holidays`);
+            
+            // Debug: Log all holidays
+            holidays.forEach(holiday => {
+              const [day, month, yr] = holiday.ActualDate.split('/');
+              const isoDate = `${yr}-${month}-${day}`;
+              addDebug(`  - ${isoDate}: ${holiday.HolidayName}`);
+            });
+    
+            publicHolidaysCache = holidays;
+            return holidays;
+          } catch (error) {
+            addDebug(`Error fetching holidays: ${error.message}`);
+            return [];
+          }
+        };
+          
         // Debug: Log all holidays and convert date format
         holidayArray.forEach((holiday, index) => {
           addDebug(`Holiday ${index}: ${JSON.stringify(holiday).substring(0, 200)}`);
