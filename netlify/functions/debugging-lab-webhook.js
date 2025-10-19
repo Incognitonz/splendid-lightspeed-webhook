@@ -336,7 +336,7 @@ exports.handler = async (event, context) => {
       const dateObj = new Date(year, date.getMonth(), date.getDate());
       
       return dateObj.toLocaleDateString('en-NZ', { 
-        weekday: 'short', 
+        weekday: 'long', 
         month: 'short', 
         day: 'numeric', 
         year: 'numeric'
@@ -384,7 +384,9 @@ exports.handler = async (event, context) => {
             // Add holiday info to the due date display if applicable
             let dueDateDisplay = dueDateFormatted;
             if (holidayEncountered) {
-              dueDateDisplay = `${dueDateFormatted} (adjusted due to ${holidayEncountered})`;
+              dueDateDisplay = `Scans due by end of: ${dueDateFormatted} (adjusted due to ${holidayEncountered})`;
+            } else {
+              dueDateDisplay = `Scans due by end of: ${dueDateFormatted}`;
             }
             
             addDebug(`\n✓ FINAL DUE DATE: ${dueDateDisplay}`);
