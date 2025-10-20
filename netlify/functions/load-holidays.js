@@ -1,7 +1,4 @@
 // Utility function to load holidays from GitHub raw content
-
-let cachedHolidays = null;
-
 async function loadHolidaysFromGitHub() {
   try {
     // If already cached in memory, return it
@@ -10,7 +7,7 @@ async function loadHolidaysFromGitHub() {
       return cachedHolidays;
     }
 
-    // GitHub raw content URL - update the username/repo/branch as needed
+    // GitHub raw content URL
     const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/Incognitonz/splendid-lightspeed-webhook/main/netlify/functions/holidays.json';
     
     console.log(`Fetching holidays from GitHub: ${GITHUB_RAW_URL}`);
@@ -24,20 +21,21 @@ async function loadHolidaysFromGitHub() {
 
     const holidaysData = await response.json();
     
-    if (!holidaysData.allHolidays || holidaysData.allHolidays.length === 0) {
-      console.log('No holidays found in GitHub file');
+    // Check the correctly nested path
+    if (!holidaysData.holidaysData || !holidaysData.holidaysData.allHolidays || holidaysData.holidaysData.allHolidays.length === 0) {
+      console.log('No holidays found in GitHub file at holidaysData.allHolidays');
       return [];
     }
 
-    // Cache in memory for this function execution
-    cachedHolidays = holidaysData.allHolidays;
+    // Cache the correct nested array
+    cachedHolidays = holidaysData.holidaysData.allHolidays;
     
-    console.log(`Loaded ${cachedHolidays.length} holidays from GitHub (last updated: ${holidaysData.lastUpdated})`);
+    // Log using the nested lastUpdated field
+    console.log(`Loaded ${cachedHolidays.length} holidays from GitHub (last updated: ${holidaysData.holidaysData.lastUpdated})`);
     return cachedHolidays;
+
   } catch (error) {
     console.error(`Error loading holidays from GitHub: ${error.message}`);
     return [];
   }
 }
-
-module.exports = { loadHolidaysFromGitHub };
