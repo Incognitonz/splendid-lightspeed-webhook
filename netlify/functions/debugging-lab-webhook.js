@@ -1,5 +1,5 @@
 // Debug Lab Webhook - netlify/functions/complete-lab-webhook.js
-const { loadHolidaysFromGitHub } = require('./load-holidays');
+const { loadHolidaysFromGitHub } = require('../utils/load-holidays');
 
 let publicHolidaysCache = null;
 
