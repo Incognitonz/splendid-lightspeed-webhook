@@ -115,7 +115,7 @@ exports.handler = async (event, context) => {
         
         // Debug: Log all holidays
         holidays.forEach(holiday => {
-          const [day, month, yr] = holiday.ActualDate.split('/');
+          const [day, month, yr] = holiday.ObservedDate.split('/');
           const isoDate = `${yr}-${month}-${day}`;
           addDebug(`  - ${isoDate}: ${holiday.HolidayName}`);
         });
