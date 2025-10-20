@@ -11,7 +11,7 @@ async function loadHolidaysFromGitHub() {
     }
 
     // GitHub raw content URL - update the username/repo/branch as needed
-    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/Incognitonz/splendid-lightspeed-webhook/refs/heads/main/netlify/functions/holidays.json';
+    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/Incognitonz/splendid-lightspeed-webhook/main/netlify/functions/holidays.json';
     
     console.log(`Fetching holidays from GitHub: ${GITHUB_RAW_URL}`);
     
