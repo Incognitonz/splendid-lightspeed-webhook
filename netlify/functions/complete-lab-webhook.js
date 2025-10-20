@@ -20,7 +20,6 @@ exports.handler = async (event, context) => {
         'dd8639f1-d1c5-3f25-ea83-cdf6ff08fb32',
         '0d2997c4-35ef-4b24-c819-104b920d0aa7',
         'bf6b2b2a-86e7-477a-b0ae-17a7fc96c11f',
-        '1f21c3ff-f618-443c-a2af-5bc0cc26b9c9',
         '31562d7d-0818-4c28-92a5-af769511592c',
         '328f8d4f-8baa-4f99-af34-0df5db7f55a5',
         'aaa21989-0f2e-446f-913a-263824dab113',
@@ -63,6 +62,7 @@ exports.handler = async (event, context) => {
         '891ba841-1a5a-4cec-a437-5497fe0e0ab7',
         'f8b44fa8-edf8-4c5d-8fd7-c37c2caa5894',
         'e711af02-9873-4b4d-bcf4-46dcb8b39a7f',
+        '1f21c3ff-f618-443c-a2af-5bc0cc26b9c9',
         '93f1859d-211c-443e-bc8b-10aab623ac60'
       ]
     };
