@@ -1,6 +1,8 @@
 // Debug Lab Webhook - netlify/functions/complete-lab-webhook.js
 const { loadHolidaysFromGitHub } = require('./load-holidays');
 
+let publicHolidaysCache = null;
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -85,7 +87,6 @@ exports.handler = async (event, context) => {
       'eb7a7fbb-700d-4621-8911-1958b7b7dd72'
     ];
 
-    let publicHolidaysCache = null;
     let debugLog = [];
     let holidayEncountered = null;
 
