@@ -137,7 +137,7 @@ exports.handler = async (event, context) => {
       
       const isHoliday = holidays.some(holiday => {
         const [day, month, yr] = holiday.ActualDate.split('/');
-        const holidayIsoDate = `${yr}-${month}-${day}`;
+        const holidayIsoDate = `${yr}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
         const match = holidayIsoDate === dateString;
         if (match) {
           addDebug(`  ✓ MATCH FOUND: ${holiday.HolidayName}`);

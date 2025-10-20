@@ -1,3 +1,5 @@
+let cachedHolidays = null;
+
 // Utility function to load holidays from GitHub raw content
 async function loadHolidaysFromGitHub() {
   try {
@@ -39,3 +41,7 @@ async function loadHolidaysFromGitHub() {
     return [];
   }
 }
+
+module.exports = {
+  loadHolidaysFromGitHub
+};
