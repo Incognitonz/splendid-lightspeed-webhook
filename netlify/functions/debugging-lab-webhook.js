@@ -357,9 +357,9 @@ exports.handler = async (event, context) => {
             // Add holiday info to the due date display if applicable
             let dueDateDisplay = dueDateFormatted;
             if (holidayEncountered) {
-              dueDateDisplay = `Scans due by end of: ${dueDateFormatted} (adjusted due to ${holidayEncountered})`;
+              dueDateDisplay = `${dueDateFormatted} (adjusted due to ${holidayEncountered})`;
             } else {
-              dueDateDisplay = `Scans due by end of: ${dueDateFormatted}`;
+              dueDateDisplay = dueDateFormatted;
             }
             
             addDebug(`\n✓ FINAL DUE DATE: ${dueDateDisplay}`);
